@@ -12,7 +12,7 @@ In addition to the filtering functionality, the application also includes a dark
 
 To use this application, simply clone the GitHub repository and open the Job Feed with Filter Git.html file in your web browser. No additional setup is required.
 
-```
+```Javascript 
 <!DOCTYPE html>
 <html lang="en">
 <head>
