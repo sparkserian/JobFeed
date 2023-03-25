@@ -1,14 +1,15 @@
 # JobFeed
-A responsive job board web application that fetches, filters, and displays job listings from an API in a grid layout.
+A responsive job feed web application that fetches, filters, and displays job listings from a Paylocity API (JSON). 
 
+This is a responsive web application that fetches, filters, and displays job listings from a JSON API. The application is built using HTML, CSS, and JavaScript as the core web technologies. The job data is fetched from an API endpoint that returns JSON-formatted data, which may vary depending on the specific API used.
 
-This project is a responsive job board web application that fetches job listings from an API, displays them in a grid layout, and allows users to filter the listings based on keywords and locations. The application is built using HTML, CSS, and JavaScript.
+The HTML structures the content of the web page, and CSS is used for styling, including a dark mode and responsive design. JavaScript is responsible for interactivity and dynamic content manipulation, such as fetching the job data from the API, filtering the job list based on user input, toggling the visibility of job details, and switching between light and dark modes.
 
-The application fetches job listings from the provided API endpoint and stores them in an array called jobs. It then dynamically creates the HTML structure for each job listing, displaying the job title, company name, location, and description. The job listings are shown in a grid layout with a 4x6 configuration, adjusting the layout according to the size of the window.
+The API endpoint used in this project returns job data in JSON format. However, the API endpoint and the data format may be different in certain circumstances, depending on the specific API or job data source being used. In such cases, the JavaScript code responsible for fetching and processing the job data may need to be adjusted accordingly to accommodate the changes in the API endpoint or data format.
 
-Users can filter the job listings by entering a keyword and selecting a location from a dropdown menu. The filtering function checks if the job title contains the keyword and if the job location matches the selected location. If both conditions are met, the job listing is included in the filtered results. Users can also reset the filters to display all job listings again.
+The job listings are displayed in a grid layout, with each job posting presented in a square. The grid layout is designed to be responsive and adapts to different screen sizes, adjusting the number of columns and rows to fit the available space.
 
-In addition to the filtering functionality, the application also includes a dark mode toggle switch that allows users to switch between a light and dark theme for better readability.
+Please note that this web application uses a fixed API endpoint, and you may need to replace it with your own or a different API endpoint if required. Ensure that the new endpoint provides job data in a compatible JSON format or adjust the JavaScript code to handle the new data format. The code is designed to be modular and easy to understand, with clear comments explaining each section and functionality.
 
 To use this application, simply clone the GitHub repository and open the Job Feed with Filter Git.html file in your web browser. No additional setup is required.
 
