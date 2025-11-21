@@ -140,16 +140,16 @@
         }
 
         /* Dark mode styles */
-        .dark-mode {
+        body.dark-mode {
             background-color: #343a40;
             color: #f8f9fa;
         }
 
-        .dark-mode h2 {
+        body.dark-mode h2 {
             color: #f8f9fa;
         }
 
-        .dark-mode .job-container {
+        body.dark-mode .job-container {
             border-color: #6c757d;
             background-color: #495057;
         }
@@ -177,8 +177,6 @@
             <label for="location-filter">Location:</label>
             <select id="location-filter">
                 <option value="">All Locations</option>
-                <option value="Andover, MA">Andover, MA</option>
-                <option value="Lawrence, MA">Lawrence, MA</option>
             </select>
             
             
@@ -193,13 +191,125 @@
     </div>
 
     <script>
+        // Configuration
+        const API_URL = 'API URL HERE';
+        
         let jobs = [];
+        
+        // Function to create a job card DOM element
+        function createJobCard(job) {
+            // Create a new div element to serve as the container for the job information
+            const jobContainer = document.createElement('div');
+            jobContainer.classList.add('job-container');
+
+            // Create a new h2 element for the job title and add the job title text
+            const jobTitle = document.createElement('h2');
+            jobTitle.classList.add('job-title');
+            jobTitle.textContent = job.title;
+            jobContainer.appendChild(jobTitle);
+
+            // Create a new button element for displaying the job details and set its text content
+            const jobDetailsButton = document.createElement('button');
+            jobDetailsButton.textContent = 'Job Details';
+            
+            // Add the job details button to the job container
+            jobContainer.appendChild(jobDetailsButton);
+
+            // Create a new div element to hold the job details information
+            const jobDetails = document.createElement('div');
+            jobDetails.classList.add('job-details');
+            
+            // Add the job details div to the job container
+            jobContainer.appendChild(jobDetails);
+
+            // Create a new div element for the job description and set its inner HTML content
+            const jobDescription = document.createElement('div');
+            jobDescription.classList.add('job-description');
+            jobDescription.innerHTML = job.description;
+            
+            // Add the job description div to the job details div
+            jobDetails.appendChild(jobDescription);
+
+            // Create a new paragraph element for the job company information and set its text content
+            const jobCompany = document.createElement('p');
+            jobCompany.textContent = `Company: ${job.companyName}`;
+            
+            // Add the job company paragraph to the job details div
+            jobDetails.appendChild(jobCompany);
+
+            // Create a new paragraph element for the job location information and set its text content
+            const jobLocation = document.createElement('p');
+            if (job.jobLocation && job.jobLocation.city && job.jobLocation.state) {
+                jobLocation.textContent = `Location: ${job.jobLocation.city}, ${job.jobLocation.state}`;
+            } else {
+                jobLocation.textContent = 'Location: Not specified';
+            }
+            
+            // Add the job location paragraph to the job details div
+            jobDetails.appendChild(jobLocation);
+
+            // Create a new div element to serve as a separator between job details and the apply button
+            const separator = document.createElement('div');
+            separator.classList.add('separator');
+            
+            // Add the separator div to the job container
+            jobContainer.appendChild(separator);
+
+            // Create a new anchor element for the apply button and set its text content, href, target, and class
+            const applyButton = document.createElement('a');
+            applyButton.textContent = 'Apply Now';
+            applyButton.href = job.applyUrl;
+            applyButton.target = '_blank';
+            applyButton.classList.add('apply-button');
+            
+            // Add the apply button anchor to the job container
+            jobContainer.appendChild(applyButton);
+
+            // Add an event listener to the job details button to toggle the display of the job details
+            jobDetailsButton.addEventListener('click', () => {
+                const isHidden = jobDetails.style.display !== 'block';
+                jobDetailsButton.textContent = isHidden ? 'Hide' : 'Job Details';
+                jobDetails.style.display = isHidden ? 'block' : 'none';
+            });
+
+            return jobContainer;
+        }
+        
+        // Function to populate location filter dropdown with unique locations from jobs data
+        function populateLocationFilter() {
+            const locationFilter = document.getElementById('location-filter');
+            
+            // Clear existing options except "All Locations"
+            locationFilter.innerHTML = '<option value="">All Locations</option>';
+            
+            // Extract unique locations
+            const locations = new Set();
+            jobs.forEach(job => {
+                if (job.jobLocation && job.jobLocation.city && job.jobLocation.state) {
+                    const location = `${job.jobLocation.city}, ${job.jobLocation.state}`;
+                    locations.add(location);
+                }
+            });
+            
+            // Sort locations alphabetically and add to dropdown
+            Array.from(locations).sort().forEach(location => {
+                const option = document.createElement('option');
+                option.value = location;
+                option.textContent = location;
+                locationFilter.appendChild(option);
+            });
+        }
         
         // Function to fetch jobs from API
         async function fetchJobs() {
+            const jobListElement = document.getElementById('job-list');
+            
+            // Show loading indicator
+            jobListElement.innerHTML = '<p>Loading...</p>';
+            
             try {
                 // Fetch data from the API using the provided URL
-                const response = await fetch('API URL HERE');
+                const response = await fetch(API_URL);
                 
                 // Parse the fetched data as JSON
                 const jobData = await response.json();
@@ -207,146 +317,35 @@
                 // Assign the jobData.jobs array to the jobs variable
                 jobs = jobData.jobs;
 
-                // Get the DOM element with id 'job-list'
-                const jobListElement = document.getElementById('job-list');
+                // Clear loading indicator
+                jobListElement.innerHTML = '';
 
-                // Loop through each job in the jobs array
+                // Populate location filter with unique locations from data
+                populateLocationFilter();
+
+                // Loop through each job in the jobs array and create job cards
                 jobs.forEach(job => {
-                    
-                    // Create a new div element to serve as the container for the job information
-                    const jobContainer = document.createElement('div');
-                    jobContainer.classList.add('job-container');
-
-                    // Create a new h2 element for the job title and add the job title text
-                    const jobTitle = document.createElement('h2');
-                    jobTitle.classList.add('job-title');
-                    jobTitle.textContent = job.title;
-                    jobContainer.appendChild(jobTitle);
-
-                    // Create a new button element for displaying the job details and set its text content
-                    const jobDetailsButton = document.createElement('button');
-                    jobDetailsButton.textContent = 'Job Details';
-                    
-                    // Add the job details button to the job container
-                    jobContainer.appendChild(jobDetailsButton);
-
-                    // Create a new div element to hold the job details information
-                    const jobDetails = document.createElement('div');
-                    jobDetails.classList.add('job-details');
-                    
-                    // Add the job details div to the job container
-                    jobContainer.appendChild(jobDetails);
-
-                    // Create a new div element for the job description and set its inner HTML content
-                    const jobDescription = document.createElement('div');
-                    jobDescription.classList.add('job-description');
-                    jobDescription.innerHTML = job.description;
-                    
-                    // Add the job description div to the job details div
-                    jobDetails.appendChild(jobDescription);
-
-                    // Create a new paragraph element for the job company information and set its text content
-                    const jobCompany = document.createElement('p');
-                    jobCompany.textContent = `Company: ${job.companyName}`;
-                    
-                    // Add the job company paragraph to the job details div
-                    jobDetails.appendChild(jobCompany);
-
-                    // Create a new paragraph element for the job location information and set its text content
-                    const jobLocation = document.createElement('p');
-                    jobLocation.textContent = `Location: ${job.jobLocation.city}, ${job.jobLocation.state}`;
-                    
-                    // Add the job location paragraph to the job details div
-                    jobDetails.appendChild(jobLocation);
-
-                    // Create a new div element to serve as a separator between job details and the apply button
-                    const separator = document.createElement('div');
-                    separator.classList.add('separator');
-                    
-                    // Add the separator div to the job container
-                    jobContainer.appendChild(separator);
-
-                    // Create a new anchor element for the apply button and set its text content, href, target, and class
-                    const applyButton = document.createElement('a');
-                    applyButton.textContent = 'Apply Now';
-                    applyButton.href = job.applyUrl;
-                    applyButton.target = '_blank';
-                    applyButton.classList.add('apply-button');
-                    
-                    // Add the apply button anchor to the job container
-                    jobContainer.appendChild(applyButton);
-
-                    // Add the job container to the job list element
-                    jobListElement.appendChild(jobContainer);
-
-                    // Add an event listener to the job details button to toggle the display of the job details
-                    jobDetailsButton.addEventListener('click', () => {
-                        jobDetailsButton.textContent = jobDetails.style.display === 'none' ? 'Hide' : 'Job Details';
-                        jobDetails.style.display = jobDetails.style.display === 'none' ? 'block' : 'none';
-                    });
-
+                    const jobCard = createJobCard(job);
+                    jobListElement.appendChild(jobCard);
                 });
 
             } catch (error) {
                 console.error('Error fetching job data:', error);
+                
+                // Display user-friendly error message
+                jobListElement.innerHTML = '<p style="color: red; font-weight: bold;">Failed to load job listings. Please try again later.</p>';
             }
         }
 
         function displayJobs(filteredJobs) {
-    const jobListElement = document.getElementById('job-list');
-    jobListElement.innerHTML = ''; // Clear the existing jobs
+            const jobListElement = document.getElementById('job-list');
+            jobListElement.innerHTML = ''; // Clear the existing jobs
 
-    filteredJobs.forEach(job => {
-        const jobContainer = document.createElement('div');
-        jobContainer.classList.add('job-container');
-
-        const jobTitle = document.createElement('h2');
-        jobTitle.classList.add('job-title');
-        jobTitle.textContent = job.title;
-        jobContainer.appendChild(jobTitle);
-
-        const jobDetailsButton = document.createElement('button');
-        jobDetailsButton.textContent = 'Job Details';
-        jobContainer.appendChild(jobDetailsButton);
-
-        const jobDetails = document.createElement('div');
-        jobDetails.classList.add('job-details');
-        jobContainer.appendChild(jobDetails);
-
-        const jobDescription = document.createElement('div');
-        jobDescription.classList.add('job-description');
-        jobDescription.innerHTML = job.description;
-        jobDetails.appendChild(jobDescription);
-
-        const jobCompany = document.createElement('p');
-        jobCompany.textContent = `Company: ${job.companyName}`;
-        jobDetails.appendChild(jobCompany);
-
-        const jobLocation = document.createElement('p');
-        jobLocation.textContent = `Location: ${job.jobLocation.city}, ${job.jobLocation.state}`;
-        jobDetails.appendChild(jobLocation);
-
-        const separator = document.createElement('div');
-        separator.classList.add('separator');
-        jobContainer.appendChild(separator);
-
-        const applyButton = document.createElement('a');
-        applyButton.textContent = 'Apply Now';
-        applyButton.href = job.applyUrl;
-        applyButton.target = '_blank';
-        applyButton.classList.add('apply-button');
-        jobContainer.appendChild(applyButton);
-
-        jobDetailsButton.addEventListener('click', () => {
-            jobDetailsButton.textContent = jobDetails.style.display === 'none' ? 'Hide' : 'Job Details';
-            jobDetails.style.display = jobDetails.style.display === 'none' ? 'block' : 'none';
-        });
-
-
-
-        jobListElement.appendChild(jobContainer); // Moved this line outside of the event listener
-    });
-}
+            filteredJobs.forEach(job => {
+                const jobCard = createJobCard(job);
+                jobListElement.appendChild(jobCard);
+            });
+        }
 
         function resetFilters() {
             document.getElementById('keyword-filter').value = '';
@@ -358,10 +357,13 @@
             const keyword = document.getElementById('keyword-filter').value.toLowerCase();
             const location = document.getElementById('location-filter').value;
 
-            const filteredJobs = jobs.filter(job =>
-                (location === '' || `${job.jobLocation.city}, ${job.jobLocation.state}` === location) &&
-                (keyword === '' || job.title.toLowerCase().includes(keyword))
-            );
+            const filteredJobs = jobs.filter(job => {
+                const jobLocation = (job.jobLocation && job.jobLocation.city && job.jobLocation.state) 
+                    ? `${job.jobLocation.city}, ${job.jobLocation.state}` 
+                    : '';
+                return (location === '' || jobLocation === location) &&
+                       (keyword === '' || job.title.toLowerCase().includes(keyword));
+            });
 
             displayJobs(filteredJobs);
         }
@@ -370,11 +372,10 @@
         document.getElementById('reset-filters').addEventListener('click', resetFilters);
 
         document.getElementById('toggle-dark-mode').addEventListener('change', (event) => {
-            const jobFeed = document.querySelector('.job-feed');
             if (event.target.checked) {
-                jobFeed.classList.add('dark-mode');
+                document.body.classList.add('dark-mode');
             } else {
-                jobFeed.classList.remove('dark-mode');
+                document.body.classList.remove('dark-mode');
             }
         });
 
