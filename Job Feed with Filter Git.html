@@ -239,7 +239,11 @@
 
             // Create a new paragraph element for the job location information and set its text content
             const jobLocation = document.createElement('p');
-            jobLocation.textContent = `Location: ${job.jobLocation.city}, ${job.jobLocation.state}`;
+            if (job.jobLocation && job.jobLocation.city && job.jobLocation.state) {
+                jobLocation.textContent = `Location: ${job.jobLocation.city}, ${job.jobLocation.state}`;
+            } else {
+                jobLocation.textContent = 'Location: Not specified';
+            }
             
             // Add the job location paragraph to the job details div
             jobDetails.appendChild(jobLocation);
@@ -263,8 +267,9 @@
 
             // Add an event listener to the job details button to toggle the display of the job details
             jobDetailsButton.addEventListener('click', () => {
-                jobDetailsButton.textContent = jobDetails.style.display === 'none' ? 'Hide' : 'Job Details';
-                jobDetails.style.display = jobDetails.style.display === 'none' ? 'block' : 'none';
+                const isHidden = jobDetails.style.display !== 'block';
+                jobDetailsButton.textContent = isHidden ? 'Hide' : 'Job Details';
+                jobDetails.style.display = isHidden ? 'block' : 'none';
             });
 
             return jobContainer;
@@ -280,8 +285,10 @@
             // Extract unique locations
             const locations = new Set();
             jobs.forEach(job => {
-                const location = `${job.jobLocation.city}, ${job.jobLocation.state}`;
-                locations.add(location);
+                if (job.jobLocation && job.jobLocation.city && job.jobLocation.state) {
+                    const location = `${job.jobLocation.city}, ${job.jobLocation.state}`;
+                    locations.add(location);
+                }
             });
             
             // Sort locations alphabetically and add to dropdown
@@ -350,10 +357,13 @@
             const keyword = document.getElementById('keyword-filter').value.toLowerCase();
             const location = document.getElementById('location-filter').value;
 
-            const filteredJobs = jobs.filter(job =>
-                (location === '' || `${job.jobLocation.city}, ${job.jobLocation.state}` === location) &&
-                (keyword === '' || job.title.toLowerCase().includes(keyword))
-            );
+            const filteredJobs = jobs.filter(job => {
+                const jobLocation = (job.jobLocation && job.jobLocation.city && job.jobLocation.state) 
+                    ? `${job.jobLocation.city}, ${job.jobLocation.state}` 
+                    : '';
+                return (location === '' || jobLocation === location) &&
+                       (keyword === '' || job.title.toLowerCase().includes(keyword));
+            });
 
             displayJobs(filteredJobs);
         }
